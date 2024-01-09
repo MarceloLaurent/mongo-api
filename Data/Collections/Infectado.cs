@@ -7,10 +7,10 @@ namespace Api.Data.Collections
     {
         public Infectado(string cpf, DateTime dataNascimento, string sexo, double latitude, double longitude)
         {
-            this.CPF = cpf;
-            this.DataNascimento = dataNascimento;
-            this.Sexo = sexo;
-            this.Localizacao = new GeoJson2DGeographicCoordinates(longitude, latitude);
+            CPF = cpf;
+            DataNascimento = dataNascimento;
+            Sexo = sexo;
+            Localizacao = new GeoJson2DGeographicCoordinates(longitude, latitude);
         }
 
         public string CPF { get; set; }

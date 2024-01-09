@@ -24,7 +24,7 @@ namespace Api.Controllers
             var infectado = new Infectado(dto.CPF, dto.DataNascimento, dto.Sexo, dto.Latitude, dto.Longitude);
 
             _infectadosCollection.InsertOne(infectado);
-            
+
             return StatusCode(201, "Infectado adicionado com sucesso");
         }
 
@@ -32,8 +32,38 @@ namespace Api.Controllers
         public ActionResult ObterInfectados()
         {
             var infectados = _infectadosCollection.Find(Builders<Infectado>.Filter.Empty).ToList();
-            
+
             return Ok(infectados);
+        }
+
+        [HttpGet("{cpf}")]
+        public ActionResult ObterInfectadoPeloCPF(string cpf)
+        {
+            var infectado = _infectadosCollection.Find(Builders<Infectado>.Filter.Eq("cPF", cpf)).FirstOrDefault();
+
+            return Ok(infectado);
+        }
+
+        [HttpPut]
+        public ActionResult AtualizarInfectado([FromBody] InfectadoDto dto)
+        {
+            var infectado = new Infectado(dto.CPF, dto.DataNascimento, dto.Sexo, dto.Latitude, dto.Longitude);
+
+            _infectadosCollection.UpdateMany(Builders<Infectado>.Filter.Where(_ => _.CPF == dto.CPF),
+            Builders<Infectado>.Update.Set("dataNascimento", dto.DataNascimento)
+                                    .Set("sexo", dto.Sexo)
+                                    .Set("latitude", dto.Latitude)
+                                    .Set("longitude", dto.Longitude));
+
+            return StatusCode(201, "Infectado atualizado com sucesso");
+        }
+
+        [HttpDelete("{cpf}")]
+        public ActionResult DeletarInfectado(string cpf)
+        {
+            _infectadosCollection.DeleteOne(Builders<Infectado>.Filter.Where(_ => _.CPF == cpf));
+
+            return Ok("Infectado deletado com sucesso");
         }
     }
 }
