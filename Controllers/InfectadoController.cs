@@ -18,14 +18,30 @@ namespace Api.Controllers
             _infectadosCollection = _mongoDB.DB.GetCollection<Infectado>(typeof(Infectado).Name.ToLower());
         }
 
+        private bool ContemInfectado(string cpf)
+        {
+            var infectado = Builders<Infectado>.Filter.Eq("cPF", cpf);
+            var reult = _infectadosCollection.Find(infectado).FirstOrDefault();
+
+            return reult != null;
+        }
+
         [HttpPost]
         public ActionResult SalvarInfectado([FromBody] InfectadoDto dto)
         {
             var infectado = new Infectado(dto.CPF, dto.DataNascimento, dto.Sexo, dto.Latitude, dto.Longitude);
 
-            _infectadosCollection.InsertOne(infectado);
+            if (!ContemInfectado(dto.CPF))
+            {
+                _infectadosCollection.InsertOne(infectado);
 
-            return StatusCode(201, "Infectado adicionado com sucesso");
+                return StatusCode(201, "Infectado adicionado com sucesso");
+            }
+            else
+            {
+                return StatusCode(202, "Infectado já existente");
+            }
+
         }
 
         [HttpGet]
@@ -49,21 +65,35 @@ namespace Api.Controllers
         {
             var infectado = new Infectado(dto.CPF, dto.DataNascimento, dto.Sexo, dto.Latitude, dto.Longitude);
 
-            _infectadosCollection.UpdateMany(Builders<Infectado>.Filter.Where(_ => _.CPF == dto.CPF),
-            Builders<Infectado>.Update.Set("dataNascimento", dto.DataNascimento)
-                                    .Set("sexo", dto.Sexo)
-                                    .Set("latitude", dto.Latitude)
-                                    .Set("longitude", dto.Longitude));
+            if (ContemInfectado(dto.CPF))
+            {
+                _infectadosCollection.UpdateMany(Builders<Infectado>.Filter.Where(_ => _.CPF == dto.CPF),
+                Builders<Infectado>.Update.Set("dataNascimento", dto.DataNascimento)
+                                        .Set("sexo", dto.Sexo)
+                                        .Set("latitude", dto.Latitude)
+                                        .Set("longitude", dto.Longitude));
 
-            return StatusCode(201, "Infectado atualizado com sucesso");
+                return StatusCode(201, "Infectado atualizado com sucesso");
+            }
+            else
+            {
+                return StatusCode(204, "Infectado não encontrado");
+            }
         }
 
         [HttpDelete("{cpf}")]
         public ActionResult DeletarInfectado(string cpf)
         {
-            _infectadosCollection.DeleteOne(Builders<Infectado>.Filter.Where(_ => _.CPF == cpf));
+            if (ContemInfectado(cpf))
+            {
+                _infectadosCollection.DeleteOne(Builders<Infectado>.Filter.Where(_ => _.CPF == cpf));
 
-            return Ok("Infectado deletado com sucesso");
+                return Ok("Infectado deletado com sucesso");
+            }
+            else
+            {
+                return StatusCode(204, "Infectado não encontrado");
+            }
         }
     }
 }
