@@ -10,7 +10,10 @@ https://localhost:5119/infectado
 
 ```json
 {
+<<<<<<< HEAD
     "cpf": "12345678910",
+=======
+>>>>>>> 2ddcab03272f87d1c55c25db905c67161acd824b
 	"dataNascimento": "1990-03-01",
 	"sexo": "M",
 	"latitude": -23.5630994,
