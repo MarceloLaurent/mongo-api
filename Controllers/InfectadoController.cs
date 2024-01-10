@@ -21,9 +21,9 @@ namespace Api.Controllers
         private bool ContemInfectado(string cpf)
         {
             var infectado = Builders<Infectado>.Filter.Eq("cPF", cpf);
-            var reult = _infectadosCollection.Find(infectado).FirstOrDefault();
+            var result = _infectadosCollection.Find(infectado).FirstOrDefault();
 
-            return reult != null;
+            return result != null;
         }
 
         [HttpPost]
